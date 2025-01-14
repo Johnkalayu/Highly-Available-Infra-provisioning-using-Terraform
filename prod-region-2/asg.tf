@@ -27,8 +27,8 @@ data "aws_ami" "amazon-linux-2" {
 
 // crating iam roles 
 
-resource "aws_iam_role" "dev-region1-role" {
-    name = "dev-region1-role"
+resource "aws_iam_role" "prod-region2-role" {
+    name = "prod-region2-role"
 
     assume_role_policy = jsonencode({
         version = "2012-10-17"
@@ -48,19 +48,19 @@ resource "aws_iam_role" "dev-region1-role" {
 
 }
 
-resource "aws_iam_role_policy_attachment" "dev-ec2_full-access" {
-    role = aws_iam_role.dev-region1-role.name
+resource "aws_iam_role_policy_attachment" "prod-ec2_full-access" {
+    role = aws_iam_role.prod-region2-role.name
     policy_arn = "arn:aws:iam::aws:policy/AmazonEC2FullAccess"
 }
 
 resource "aws_iam_role_policy_attachment" "dev-s3-access" {
-    role = aws_iam_role.dev-region1-role.name
+    role = aws_iam_role.prod-region2-role.name
     policy_arn = "arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess" 
 }
 
-resource "aws_iam_instance_profile" "dev-ec2-profile" {
-    name = "dev-ec2-profile"
-    role = aws_iam_role.dev-region1-role.name
+resource "aws_iam_instance_profile" "dprod-ec2-profile" {
+    name = "prod-ec2-profile"
+    role = aws_iam_role.prod-region2-role.name
 }
 
 
@@ -69,12 +69,12 @@ resource "aws_iam_instance_profile" "dev-ec2-profile" {
 
 
 
-resource "aws_launch_template" "dev-template" {
-    name = "dev-template"
+resource "aws_launch_template" "prod-template" {
+    name = "prod-template"
     image_id = data.aws_iam.amazon-linux-2.id
     instance_type = "t2.medium"
     instance_profile = {
-        name = aws_iam_instance_profile.dev-ec2-profile.name
+        name = aws_iam_instance_profile.prod-ec2-profile.name
     }
     user_data = base64encode(template("dev.sh", {postgres_url = aws_db_instances.aws_db_instances.endpoint}))
     vpc_security_groups_ids = [aws_securirty_group.alb-sg.id]
@@ -84,19 +84,19 @@ resource "aws_launch_template" "dev-template" {
     }
 
 }
-resource "aws_autoscaling_group" "dev_asg" {
-    name = "dev-asg-template"
+resource "aws_autoscaling_group" "prod_asg" {
+    name = "prod-asg-template"
     desired_capacity = "1"
     max_size = "3"
     min_size = "1"
     force_delete = true
     depends_on = [ aws_lb.app-load-balancer ]
     health_check_type = "EC2"
-    target_group_arns = [aws_lb_target.dev-alb-target.arn]
+    target_group_arns = [aws_lb_target.prod-alb-target.arn]
     vpc_zone_identifier = [aws-subnet.pravet-subnet-1.id, aws_subnet.pravet-subnet-2.id]
    
     launch_template {
-        id = aws_launch_template.dev-template.id
+        id = aws_launch_template.prod-template.id
         version = "$Latest"
    }  
    tag {

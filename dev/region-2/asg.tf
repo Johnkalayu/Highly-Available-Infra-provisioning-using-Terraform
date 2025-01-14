@@ -27,7 +27,7 @@ data "aws_ami" "amazon-linux-2" {
 
 // crating iam roles 
 
-resource "aws_iam_role" "dev-region1-role" {
+resource "aws_iam_role" "dev-region2-role" {
     name = "dev-region1-role"
 
     assume_role_policy = jsonencode({
@@ -49,18 +49,18 @@ resource "aws_iam_role" "dev-region1-role" {
 }
 
 resource "aws_iam_role_policy_attachment" "dev-ec2_full-access" {
-    role = aws_iam_role.dev-region1-role.name
+    role = aws_iam_role.dev-region2-role.name
     policy_arn = "arn:aws:iam::aws:policy/AmazonEC2FullAccess"
 }
 
 resource "aws_iam_role_policy_attachment" "dev-s3-access" {
-    role = aws_iam_role.dev-region1-role.name
+    role = aws_iam_role.dev-region2-role.name
     policy_arn = "arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess" 
 }
 
 resource "aws_iam_instance_profile" "dev-ec2-profile" {
     name = "dev-ec2-profile"
-    role = aws_iam_role.dev-region1-role.name
+    role = aws_iam_role.dev-region2-role.name
 }
 
 

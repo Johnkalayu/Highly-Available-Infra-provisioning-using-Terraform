@@ -2,7 +2,7 @@ resource "aws_lb" "app-load-balancer" {
     name = "app-load-balancer"
     internal = false
     load_balancer_typr = "application"
-    security_group_id = [aws_securirty_group.alb-sg-region1]
+    security_group_id = [aws_securirty_group.alb-sg-region2]
     subnet_id = [aws_subnet.private-subnet-1.id, aws_subnet.private-subnet-2.id]
 
     enable_deletion_protection = false
@@ -13,7 +13,7 @@ resource "aws_lb_target_group" "alb-target-group" {
     port = 8080
     protocol = "HTTP"
     traget_type = "inastance"
-    vpc_id = aws+vpc.dev-vpc.vpc_id
+    vpc_id = aws_vpc.dev-vpc.vpc_id
 
     health_check {
         enable = true

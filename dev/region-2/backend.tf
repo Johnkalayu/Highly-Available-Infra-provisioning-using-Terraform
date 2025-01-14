@@ -3,7 +3,7 @@ terraform {
     name = "dev-region2-terrafrom-state-file"
     region = "ap-southeast-2"
     key = "terraform-module/region2/terraform.state"
-    dynamodb_table = "dev-region2-tf-lock"
+    dynamodb_table = "dev-terraform-lock-region2"
     encrypt = true
 
   }

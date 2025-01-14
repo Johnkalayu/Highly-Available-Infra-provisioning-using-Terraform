@@ -14,14 +14,14 @@ locals {
 
 
 
-resource "aws_vpc_endpoint" "dev-vpc-endpoint" {
+resource "aws_vpc_endpoint" "prod-vpc-endpoint" {
     for_each =  local.endpoint
-    vpc_id = aws_vpc.dev-vpc.vpc.id
+    vpc_id = aws_vpc.vpc-prod.vpc.id
     vpc_endpoint_type ="Interface"
     service_name = "come.amazoneaws.ap-souther-1.$(each.value.name)"
 
     security_group_id = [
-      aws_security_group.dev-vpc-endpoint-sg.id
+      aws_security_group.prod-vpc-endpoint-sg.id
     ]
     
 }
