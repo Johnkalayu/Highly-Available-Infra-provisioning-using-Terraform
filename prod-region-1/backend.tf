@@ -1,6 +1,6 @@
 terraform {
   backend "s3" {
-    name = "prod-tfstate-region1"
+    name = "prod-region1-terraform-state-file"
     region = "ap-southeast-2"
     key = "terraform-module/region1/terraform.state"
     dynamodb_table = "prod-terraform-lock-region1"
