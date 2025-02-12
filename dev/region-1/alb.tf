@@ -13,7 +13,7 @@ resource "aws_lb_target_group" "alb-target-group" {
     port = 8080
     protocol = "HTTP"
     traget_type = "inastance"
-    vpc_id = aws_vpc.vpc-prod.vpc_id
+    vpc_id = aws+vpc.dev-vpc.vpc_id
 
     health_check {
         enable = true
