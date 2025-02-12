@@ -1,4 +1,4 @@
-image: amazonelinux:2
+image: amazonlinux:2
 
 stages:
   - terraform_apply
