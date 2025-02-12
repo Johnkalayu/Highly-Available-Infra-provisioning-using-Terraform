@@ -1,4 +1,4 @@
-resource "aws_vpc" "vpc-prod" {
+resource "aws_vpc" "vpc-dev" {
     cidr_block = "10.0.0.0/16"
     enable_dns_hostnames = true
     enable_dns_support = true
@@ -7,7 +7,7 @@ resource "aws_vpc" "vpc-prod" {
 }
 
 resource "aws_internet_gateway" "inter_gateway" {
-    vpc_id = aws_vpc.vpc-prod.id
+    vpc_id = aws_vpc.vpc-dev.id
 }
 
 #resource "aws_internet_gateway_attachment" "inter-gateway-attachment" {
@@ -32,7 +32,7 @@ resource "aws_nat_gateway" "ng-az-2" {
     depends_on = [ aws_eip.nat-eip-az2 ]
 }
 resource "aws_route_table" "public-rt-1" {
-    vpc_id = aws_vpc.vpc-prod.id
+    vpc_id = aws_vpc.vpc-dev.id
 
     route = {
         cidr_block = "0.0.0.0/0"
@@ -56,7 +56,7 @@ resource "aws_route_table_association" "public-rt-2-association" {
 // creating pravet route table for app subnet 
 
 resource "aws_route_table" "private-rt-1" {
-    vpc_id = aws_vpc.vpc-prod.id
+    vpc_id = aws_vpc.vpc-dev.id
 
     route = {
         cdri_block = "0.0.0.0/0"
@@ -69,7 +69,7 @@ resource "aws_route_table_association" "private-rt-1-association" {
 }
 
 resource "aws_route_table" "private-rt-2" {
-    vpc_id = aws_vpc.vpc-prod.id
+    vpc_id = aws_vpc.vpc-dev.id
 
     route = {
         cdri_block = "0.0.0.0/0"
