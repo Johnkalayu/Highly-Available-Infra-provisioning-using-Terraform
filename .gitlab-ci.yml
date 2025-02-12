@@ -42,7 +42,7 @@ before_script:
    - cd $TF_DIR
    - aws configure set region $AWS_DEFAULT_REGION  
    - terraform init 
-   -  terraform validate
+   - terraform validate
 
 deploy_region_1:
   stage: terraform_apply
@@ -65,7 +65,7 @@ deploy_region_2:
     - main
     - prod
 
- destroy_region_1:
+destroy_region_1:
   stage: terraform_destroy
   extends: .terraform_template     
   script:
