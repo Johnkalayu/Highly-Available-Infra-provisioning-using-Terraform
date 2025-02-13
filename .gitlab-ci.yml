@@ -13,26 +13,30 @@ before_script:
       ./aws/install -i /usr/local/bin -b /usr/local/bin;
     fi
 
-  - if ! commad -v terraform &> /dev/null; then
+  - if ! command -v terraform &> /dev/null; then
         yum-config-manager --add-repo https://rpm.releases.hashicorp.com/AmazonLinux/hashicorp.repo;
         yum install -y terraform;
       fi 
+      
+  - echo " installation done"
+  - aws --version
+  - terraform --version
+  - echo " configuring aws credentials"
 
   - |
      if [[ $CI_COMMIT_BRANCH == "main" ]]; then
         export AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID_DEV
         export AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY_DEV
         export AWS_DEFAULT_REGION=$AWS_DEFAULT_REGION_DEV
-        export TF_DIR="dev/region-1, dev/region-2"
-
       elif [[ $CI_COMMIT_BRANCH == "prod" ]]; then
         export AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID_PROD
         export AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY_PROD
         export AWS_DEFAULT_REGION=$AWS_DEFAULT_REGION_PROD
-        export TF_DIR="prod/region-1,prod/region-2"
       else
         echo "no valide aws credentials for this branch"
       fi
+    
+
   - aws sts get-caller-identity
 
 .terraform_template:
@@ -42,45 +46,74 @@ before_script:
    - terraform init 
    - terraform validate
 
-deploy_region_1:
+deploy_dev_1:
   stage: terraform_apply
   extends: .terraform_template
+  variables: 
+    TF_DIR: dev/region1
   script:
     - terraform plan -out=tfplan 
     - terraform apply -auto-approve tfplan
   when: manual
   only:
     - main
-    - prod
-deploy_region_2:
+
+deploy_dev_2:
   stage: terraform_apply
   extends: .terraform_template
+  variables: 
+    TF_DIR: dev/region2
   script:
     - terraform plan -out=tfplan
     - terraform apply -auto-approve tfplan
   when: manual
   only:
     - main
+
+deploy_prod_1:
+  stage: terraform_apply
+  extends: .terraform_template
+  variables: 
+    TF_DIR: prod/region1
+  script: 
+    - terraform plan -out=tfplan
+    - terraform apply -auto-approve tfplan
+  when: manual  
+  only:
     - prod
 
-destroy_region_1:
+deploy_prod_2:
+  stage: terraform_apply
+  extends: .terraform_template
+  variables: 
+    TF_DIR: prod/region2
+  script:
+    - terraform plan -out=tfplan
+    - terraform apply -auto-approve tfplan
+  when: manual
+  only:
+    - prod
+
+destroy_dev_1:
   stage: terraform_destroy
   extends: .terraform_template     
+  variables:
+    TF_DIR: dev/region1
   script:
     - terraform plan -destroy -out=tfplan
     - terraform destroy -auto-approve
   when: manual
   only:
-    - main
-    - prod  
+    - main 
 
-destroy_region_2:
+destroy_dev_2:
   stage: terraform_destroy
   extends: .terraform_template
+  variables:
+    TF_DIR: dev/region2
   script:
     - terraform plan -destroy -out=tfplan
     - terraform destroy -auto-approve
   when: manual
   only:
     - main
-    - prod
