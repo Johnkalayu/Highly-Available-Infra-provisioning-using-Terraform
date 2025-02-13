@@ -13,12 +13,10 @@ before_script:
       ./aws/install -i /usr/local/bin -b /usr/local/bin;
     fi
 
-
-  - if ! command -v terraform &>/dev/null; then
-      curl "https://releases.hashicorp.com/terraform/0.14.7/terraform_0.14.7_linux_amd64.zip" -o "terraform.zip";
-      unzip terraform.zip;
-      yum install -y terraform;
-    fi  
+  - if ! commad -v terraform &> /dev/null; then
+        yum-config-manager --add-repo https://rpm.releases.hashicorp.com/AmazonLinux/hashicorp.repo;
+        yum install -y terraform;
+      fi 
 
   - |
      if [[ $CI_COMMIT_BRANCH == "main" ]]; then
