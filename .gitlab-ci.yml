@@ -44,6 +44,7 @@ before_script:
 .terraform_destroy_template:
    extends: .terraform_te,plate
    script:
+    - cd $TF_DIR
     - terraform plan -destroy -out=tfplan
     - terrafor destroy -auto-approve
 
