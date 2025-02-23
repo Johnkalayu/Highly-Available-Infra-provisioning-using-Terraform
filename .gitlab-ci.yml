@@ -7,16 +7,18 @@ stages:
 before_script:
   - yum install -y yum-utils unzip
 
-  - if ! command -v aws &> /dev/null; then
-      curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip";
-      unzip awscliv2.zip;
-      ./aws/install -i /usr/local/bin -b /usr/local/bin;
-    fi
+  - |
+      if ! command -v aws &> /dev/null; then
+        curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip";
+        unzip awscliv2.zip;
+        ./aws/install -i /usr/local/bin -b /usr/local/bin;
+      fi
 
-  - if ! command -v terraform &> /dev/null; then
-        yum-config-manager --add-repo https://rpm.releases.hashicorp.com/AmazonLinux/hashicorp.repo;
-        yum install -y terraform;
-      fi 
+  - |
+      if ! command -v terraform &> /dev/null; then 
+        yum-config-manager --add-repo https://rpm.releases.hashicorp.com/AmazonLinux/hashicorp.repo
+        yum install -y terraform
+      fi
 
   - |
       if [[ $CI_COMMIT_BRANCH == "main" ]]; then
@@ -34,23 +36,21 @@ before_script:
 
 .terraform_template:
   script:
-   - cd $TF_DIR
-   - aws configure set region $AWS_DEFAULT_REGION  
+   - cd $TF_DIR 
    - terraform init 
+   - terraform fmt
    - terraform validate
    - terraform plan -out=tfplan
-    - terraform apply -auto-approve tfplan
+   - terraform apply -auto-approve tfplan
 
 .terraform_destroy_template:
-   extends: .terraform_te,plate
    script:
     - cd $TF_DIR
-    - terraform plan -destroy -out=tfplan
-    - terrafor destroy -auto-approve
+    - terraform destroy -auto-approve
 
 
 deploy:
-  stage: tarraform_apply
+  stage: terraform_apply
   extends: .terraform_template
   parallel:
       matrix:
